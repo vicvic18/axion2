@@ -2,10 +2,13 @@ import { Routes, Route } from 'react-router'
 import Home from './pages/Home'
 import SubPageA from './pages/SubPageA'
 import SubPageB from './pages/SubPageB'
+import ScrollToTop from './components/ScrollToTop'
 
 export default function App() {
   return (
-    <Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/dashboard" element={<Home scrollTo="dashboard" />} />
       <Route path="/staking" element={<Home scrollTo="staking" />} />
@@ -18,5 +21,6 @@ export default function App() {
       <Route path="/terms" element={<SubPageA />} />
       <Route path="/disclaimer" element={<SubPageA />} />
     </Routes>
+    </>
   )
 }
