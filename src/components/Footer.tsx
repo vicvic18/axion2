@@ -128,16 +128,25 @@ export default function Footer() {
                 {column.title}
               </h4>
               <ul className="space-y-3">
-                {column.links.map((link) => (
+              {column.links.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      target={isInternal(link.href) ? undefined : "_blank"}
-                      rel={isInternal(link.href) ? undefined : "noopener noreferrer"}
-                      className="text-sm text-axion-text-tertiary transition-colors hover:text-white"
-                    >
-                      {link.label}
-                    </a>
+                    {isInternal(link.href) ? (
+                      <Link
+                        to={link.href}
+                        className="text-sm text-axion-text-tertiary transition-colors hover:text-white"
+                      >
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-axion-text-tertiary transition-colors hover:text-white"
+                      >
+                        {link.label}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
