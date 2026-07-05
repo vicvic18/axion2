@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Offset for fixed header anchor links */
+html {
+  scroll-padding-top: 80px;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 6.7%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 10.6%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 206 100% 54%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 6.7%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 10.6%;
+    --muted-foreground: 240 2% 64%;
+    --accent: 0 0% 10.6%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 3% 16.5%;
+    --input: 240 3% 16.5%;
+    --ring: 206 100% 54%;
+    --radius: 0.5rem;
+
+    --brand-blue: #1199FF;
+    --brand-blue-light: #4DB8FF;
+    --brand-blue-dark: #0A6BCC;
+    --success: #22C55E;
+    --success-glow: rgba(34, 197, 94, 0.15);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-[#0A0A0A] text-white antialiased;
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, '.SFNSText-Regular', 'San Francisco', 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+
+  /* Remove number input spinners */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+}
+
+@layer utilities {
+  .text-brand {
+    color: var(--brand-blue);
+  }
+  .bg-brand {
+    background-color: var(--brand-blue);
+  }
+  .text-success {
+    color: var(--success);
+  }
+  .bg-success-glow {
+    background-color: var(--success-glow);
+  }
+  .border-brand {
+    border-color: var(--brand-blue);
+  }
+  .font-tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer base {
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.5);
+      opacity: 0.5;
+    }
+  }
+
+  @keyframes countUp {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
+  .animate-pulse-dot {
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
+  .stagger-5 { animation-delay: 0.5s; }
+  .stagger-6 { animation-delay: 0.6s; }
+}
