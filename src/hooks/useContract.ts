@@ -205,10 +205,25 @@ export function useContract() {
         await tx.wait();
         return true;
       } catch (err: any) {
+        // User rejected transaction (MetaMask/Trust cancel)
+        if (err?.code === 4001 || err?.code === "ACTION_REJECTED" ||
+            err?.message?.includes("rejected") || err?.message?.includes("user denied")) {
+          setError("Transaction was cancelled by user");
+          return false;
+        }
+        // Insufficient balance
+        if (err?.message?.includes("insufficient funds") || err?.code === -32000) {
+          setError("Insufficient BNB balance to complete this stake");
+          return false;
+        }
+        // Contract revert - extract revert reason
         const msg = err?.error?.message || err?.message || "Stake failed";
-        // Clean up revert messages
         const revertMatch = msg.match(/revert(?:ed with reason string)?\s*"?([^"]*)"?/i);
-        setError(revertMatch?.[1] || msg);
+        if (revertMatch?.[1]) {
+          setError(`Transaction failed: ${revertMatch[1]}`);
+          return false;
+        }
+        setError(msg);
         return false;
       } finally {
         setLoading(false);

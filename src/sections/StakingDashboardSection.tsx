@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 // Default day seconds when contract not connected (TEST=5, PROD=86400)
-const DEFAULT_DAY_SECONDS = 86400;
+const DEFAULT_DAY_SECONDS = 5;
 
 // Plan definitions (day multipliers, not hardcoded seconds)
 const PLANS = [
@@ -67,7 +67,7 @@ function formatPeriod(seconds: number): string {
 }
 
 export default function StakingDashboardSection() {
-  const { isConnected, isWrongNetwork, switchNetwork } = useWallet();
+  const { isConnected, isWrongNetwork, switchNetwork, balance } = useWallet();
   const { isReady, loading, error, setError, stake, contract } = useContract();
   const [sel, setSel] = useState(1); // plan id (1 or 7)
   const [amt, setAmt] = useState("");
@@ -111,6 +111,14 @@ export default function StakingDashboardSection() {
   const doStake = async () => {
     if (!isConnected || bnb <= 0) return;
     if (isWrongNetwork) { await switchNetwork(); return; }
+
+    // Check balance before staking
+    const balanceNum = parseFloat(balance || "0");
+    if (balanceNum < bnb) {
+      setError(`Insufficient BNB balance. Wallet: ${balanceNum.toFixed(6)} BNB, Stake: ${bnb} BNB`);
+      return;
+    }
+
     setStaking(true);
     setTxSuccess(false);
     setError(null);
@@ -272,7 +280,10 @@ export default function StakingDashboardSection() {
             )}
 
             <div className="mb-4">
-              <label className="mb-2 block text-xs text-axion-text-tertiary">Amount (BNB)</label>
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-xs text-axion-text-tertiary">Amount (BNB)</span>
+                <span className="text-xs text-axion-text-muted">Balance: {parseFloat(balance || "0").toFixed(4)} BNB</span>
+              </div>
               <div className="relative">
                 <input type="number" value={amt} onChange={(e) => setAmt(e.target.value)} placeholder="0.00" min="0" step="0.001"
                   className="w-full rounded-xl border border-axion-border bg-axion-bg-tertiary px-4 py-3 text-lg font-tabular text-white outline-none transition-colors placeholder:text-axion-text-muted focus:border-brand" />
@@ -298,9 +309,9 @@ export default function StakingDashboardSection() {
               </div>
             )}
 
-            <button onClick={doStake} disabled={!isConnected || bnb <= 0 || staking || loading}
+            <button onClick={doStake} disabled={!isConnected || bnb <= 0 || staking || loading || parseFloat(balance || "0") < bnb}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-sm font-semibold text-white transition-all hover:bg-brand-light hover:shadow-brand-glow disabled:cursor-not-allowed disabled:opacity-50">
-              {staking || loading ? "Processing..." : !isConnected ? "Connect Wallet to Stake" : isWrongNetwork ? "Switch Network" : bnb <= 0 ? "Enter Amount" : <>Stake {bnb} BNB <ArrowRight className="h-4 w-4" /></>}
+              {staking || loading ? "Processing..." : !isConnected ? "Connect Wallet to Stake" : isWrongNetwork ? "Switch Network" : bnb <= 0 ? "Enter Amount" : parseFloat(balance || "0") < bnb ? "Insufficient Balance" : <>Stake {bnb} BNB <ArrowRight className="h-4 w-4" /></>}
             </button>
           </div>
         </div>

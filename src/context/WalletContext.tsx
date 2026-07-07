@@ -8,6 +8,7 @@ interface WalletState {
   error: string | null;
   chainId: number | null;
   walletName: string | null;
+  balance: string; // BNB balance in ether
 }
 
 interface WalletContextType extends WalletState {
@@ -17,6 +18,7 @@ interface WalletContextType extends WalletState {
   switchNetwork: () => Promise<void>;
   /** True if wallet is on the wrong network */
   isWrongNetwork: boolean;
+  refreshBalance: () => Promise<void>;
 }
 
 const WalletContext = createContext<WalletContextType | null>(null);
@@ -39,11 +41,25 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     error: null,
     chainId: null,
     walletName: null,
+    balance: "0",
   });
 
   const wcProviderRef = useRef<any>(null);
 
   const isWrongNetwork = state.chainId !== null && state.chainId !== BSC_CHAIN_ID;
+
+  // Fetch balance
+  const refreshBalance = useCallback(async () => {
+    if (!state.address || typeof window === "undefined") return;
+    try {
+      const { BrowserProvider } = await import("ethers");
+      const provider = new BrowserProvider((window as any).ethereum);
+      const bal = await provider.getBalance(state.address);
+      setState(prev => ({ ...prev, balance: (Number(bal) / 1e18).toFixed(6) }));
+    } catch {
+      // ignore
+    }
+  }, [state.address]);
 
   // Check existing connection
   useEffect(() => {
@@ -55,19 +71,28 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         const accounts = await eth.request({ method: "eth_accounts" });
         if (accounts?.length > 0) {
           const chainId = await eth.request({ method: "eth_chainId" });
-          setState({
+          setState(prev => ({
+            ...prev,
             address: accounts[0],
             isConnected: true,
             isConnecting: false,
             error: null,
             chainId: parseInt(chainId, 16),
             walletName: "MetaMask",
-          });
+          }));
         }
       } catch { /* ignore */ }
     };
     check();
   }, []);
+
+  // Auto-refresh balance every 10s when connected
+  useEffect(() => {
+    if (!state.isConnected) return;
+    refreshBalance();
+    const interval = setInterval(refreshBalance, 10000);
+    return () => clearInterval(interval);
+  }, [state.isConnected, state.address, refreshBalance]);
 
   // Listen for wallet changes
   useEffect(() => {
@@ -76,7 +101,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     if (!eth) return;
     const onAccounts = (accounts: string[]) => {
       if (accounts.length === 0) {
-        setState(prev => ({ ...prev, address: null, isConnected: false, walletName: null }));
+        setState(prev => ({ ...prev, address: null, isConnected: false, walletName: null, balance: "0" }));
       } else {
         setState(prev => ({ ...prev, address: accounts[0], isConnected: true }));
       }
@@ -105,7 +130,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         params: [{ chainId: chainIdHex }],
       });
     } catch (switchErr: any) {
-      // Chain not added yet, try adding it
       if (switchErr?.code === 4902) {
         await eth.request({
           method: "wallet_addEthereumChain",
@@ -202,7 +226,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
     provider.on("accountsChanged", (newAccounts: string[]) => {
       if (newAccounts.length === 0) {
-        setState({ address: null, isConnected: false, isConnecting: false, error: null, chainId: null, walletName: null });
+        setState({ address: null, isConnected: false, isConnecting: false, error: null, chainId: null, walletName: null, balance: "0" });
       } else {
         setState(prev => ({ ...prev, address: newAccounts[0] }));
       }
@@ -225,7 +249,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       } else if (walletId === "trust") {
         await connectInjected("Trust Wallet");
       } else if (walletId === "binance") {
-        await connectInjected("Binance Web3 Wallet");
+        await connectInjected("Binance Web3 Web3 Wallet");
       }
     } catch (err: any) {
       if (err?.code === 4001 || err?.message?.toLowerCase().includes("rejected")) {
@@ -242,11 +266,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       try { wcProviderRef.current.disconnect(); } catch { /* ok */ }
       wcProviderRef.current = null;
     }
-    setState({ address: null, isConnected: false, isConnecting: false, error: null, chainId: null, walletName: null });
+    setState({ address: null, isConnected: false, isConnecting: false, error: null, chainId: null, walletName: null, balance: "0" });
   }, []);
 
   return (
-    <WalletContext.Provider value={{ ...state, connect, disconnect, switchNetwork, isWrongNetwork }}>
+    <WalletContext.Provider value={{ ...state, connect, disconnect, switchNetwork, isWrongNetwork, refreshBalance }}>
       {children}
     </WalletContext.Provider>
   );
