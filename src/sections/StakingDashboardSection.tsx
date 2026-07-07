@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 // Default day seconds when contract not connected (TEST=5, PROD=86400)
-const DEFAULT_DAY_SECONDS = 5;
+const DEFAULT_DAY_SECONDS = 86400;
 
 // Plan definitions (day multipliers, not hardcoded seconds)
 const PLANS = [
