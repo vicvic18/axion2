@@ -70,14 +70,17 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       try {
         const accounts = await eth.request({ method: "eth_accounts" });
         if (accounts?.length > 0) {
-          const chainId = await eth.request({ method: "eth_chainId" });
+          const chainIdHex = await eth.request({ method: "eth_chainId" });
+          const chainIdNum = typeof chainIdHex === "string" && chainIdHex.startsWith("0x")
+            ? parseInt(chainIdHex, 16)
+            : parseInt(String(chainIdHex));
           setState(prev => ({
             ...prev,
             address: accounts[0],
             isConnected: true,
             isConnecting: false,
             error: null,
-            chainId: parseInt(chainId, 16),
+            chainId: isNaN(chainIdNum) ? null : chainIdNum,
             walletName: "MetaMask",
           }));
         }
@@ -107,7 +110,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       }
     };
     const onChain = (chainId: string) => {
-      setState(prev => ({ ...prev, chainId: parseInt(chainId, 16) }));
+      const chainIdNum = typeof chainId === "string" && chainId.startsWith("0x")
+        ? parseInt(chainId, 16)
+        : parseInt(String(chainId));
+      setState(prev => ({ ...prev, chainId: isNaN(chainIdNum) ? null : chainIdNum }));
     };
     eth.on("accountsChanged", onAccounts);
     eth.on("chainChanged", onChain);
@@ -157,13 +163,17 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       throw new Error(`${walletName} not found`);
     }
     const accounts = await eth.request({ method: "eth_requestAccounts" });
-    const chainId = await eth.request({ method: "eth_chainId" });
+    const chainIdHex = await eth.request({ method: "eth_chainId" });
+    // Safe parse: handle both hex "0x61" and decimal "97" strings
+    const chainIdNum = typeof chainIdHex === "string" && chainIdHex.startsWith("0x")
+      ? parseInt(chainIdHex, 16)
+      : parseInt(String(chainIdHex));
     setState(prev => ({
       ...prev,
       address: accounts[0],
       isConnected: true,
       isConnecting: false,
-      chainId: parseInt(chainId, 16),
+      chainId: isNaN(chainIdNum) ? null : chainIdNum,
       walletName,
     }));
   };
@@ -177,7 +187,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       projectId: PROJECT_ID,
       chains: [BSC_CHAIN_ID],
       showQrModal: false,
-      methods: ["eth_sendTransaction", "eth_sign", "personal_sign", "eth_accounts", "eth_chainId"],
+      methods: ["eth_sendTransaction", "personal_sign", "eth_accounts", "eth_chainId"],
       events: ["chainChanged", "accountsChanged"],
       rpcMap: { [BSC_CHAIN_ID]: BSC_RPC },
       metadata: {
@@ -212,7 +222,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
 
     const accounts = provider.accounts;
-    const chainId = provider.chainId;
+    const wcChainId = provider.chainId;
     wcProviderRef.current = provider;
 
     setState(prev => ({
@@ -220,7 +230,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       address: accounts[0],
       isConnected: true,
       isConnecting: false,
-      chainId,
+      chainId: typeof wcChainId === "number" ? wcChainId : parseInt(String(wcChainId)) || null,
       walletName: "WalletConnect",
     }));
 

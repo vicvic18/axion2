@@ -78,6 +78,7 @@ export default function UserDashboardSection() {
     claimAll,
     claimCommission,
     getReferralLink,
+    contract,
   } = useContract();
 
   const useReal = isConnected && isReady;
@@ -87,6 +88,7 @@ export default function UserDashboardSection() {
   const [stakes, setStakes] = useState<StakeData[]>([]);
   const [referral, setReferral] = useState<ReferralData>(emptyReferral);
   const [referralLink, setReferralLink] = useState("");
+  const [referralUnlocked, setReferralUnlocked] = useState(false); // >= 0.01 BNB staked
 
   // UI states
   const [claiming, setClaiming] = useState<number | null>(null);
@@ -110,6 +112,16 @@ export default function UserDashboardSection() {
       if (d) setDashboard(d);
       setStakes(s); // allow empty array
       if (r) setReferral(r);
+
+      // Check referral eligibility: userTotalStakedAmount >= 0.01 BNB
+      if (contract && address) {
+        try {
+          const lifetimeStaked = await contract.userTotalStakedAmount(address);
+          setReferralUnlocked(lifetimeStaked >= BigInt("10000000000000000")); // 0.01 BNB in wei
+        } catch {
+          setReferralUnlocked(false);
+        }
+      }
     } catch (err: any) {
       console.error("Fetch error:", err);
     } finally {
@@ -395,21 +407,34 @@ export default function UserDashboardSection() {
                   <div className="lg:col-span-2 space-y-5">
                     {/* Referral Link */}
                     <div>
-                      <label className="mb-2 block text-xs text-axion-text-tertiary">Your Referral Link</label>
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 overflow-hidden rounded-xl border border-axion-border bg-axion-bg-secondary px-4 py-3">
-                          <p className="truncate font-mono text-sm text-axion-text-secondary">{referralLink || "Connect wallet to get your link"}</p>
+                      {referralUnlocked ? (
+                        <>
+                          <label className="mb-2 block text-xs text-axion-text-tertiary">Your Referral Link</label>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 overflow-hidden rounded-xl border border-axion-border bg-axion-bg-secondary px-4 py-3">
+                              <p className="truncate font-mono text-sm text-axion-text-secondary">{referralLink || "Connect wallet to get your link"}</p>
+                            </div>
+                            <button onClick={handleCopy} disabled={!referralLink}
+                              className="flex shrink-0 items-center gap-2 rounded-xl border border-axion-border bg-axion-bg-secondary px-4 py-3 text-sm font-medium text-white transition-all hover:border-brand hover:bg-brand/10 disabled:cursor-not-allowed disabled:opacity-50">
+                              {copied ? <><Check className="h-4 w-4 text-axion-success" /><span className="text-axion-success">Copied</span></>
+                                : <><Copy className="h-4 w-4" />Copy</>}
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+                          <div className="flex items-center gap-2">
+                            <Lock className="h-4 w-4 text-amber-400" />
+                            <span className="text-sm font-semibold text-amber-300">Referral Link Locked</span>
+                          </div>
+                          <p className="mt-1.5 text-xs text-amber-200/70">
+                            Stake at least <span className="font-semibold text-amber-300">0.01 BNB</span> to unlock your referral link and start earning commissions.
+                          </p>
+                          <a href="#staking" className="mt-3 inline-flex items-center gap-1 rounded-lg bg-brand/20 px-3 py-1.5 text-xs font-medium text-brand transition-all hover:bg-brand/30">
+                            Go Stake Now <ArrowRight className="h-3 w-3" />
+                          </a>
                         </div>
-                        <button onClick={handleCopy} disabled={!referralLink}
-                          className="flex shrink-0 items-center gap-2 rounded-xl border border-axion-border bg-axion-bg-secondary px-4 py-3 text-sm font-medium text-white transition-all hover:border-brand hover:bg-brand/10 disabled:cursor-not-allowed disabled:opacity-50">
-                          {copied ? <><Check className="h-4 w-4 text-axion-success" /><span className="text-axion-success">Copied</span></>
-                            : <><Copy className="h-4 w-4" />Copy</>}
-                        </button>
-                      </div>
-                      <p className="mt-2 flex items-center gap-1.5 text-[11px] text-axion-text-muted">
-                        <Lock className="h-3 w-3" />
-                        Stake at least 0.01 BNB to unlock your referral link
-                      </p>
+                      )}
                     </div>
 
                     {/* Stats Row - shows real data (0 if no referrals) */}
