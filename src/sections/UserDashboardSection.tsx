@@ -162,12 +162,16 @@ export default function UserDashboardSection() {
     const totalReward = stakes
       .filter((s) => s.status === "claimable")
       .reduce((sum, s) => sum + parseFloat(s.reward), 0);
+    // Frontend-calculated totalClaimed = principal + reward for all claimed stakes
+    const totalClaimed = stakes
+      .filter((s) => s.status === "claimed")
+      .reduce((sum, s) => sum + parseFloat(s.principal) + parseFloat(s.reward), 0);
     return {
       walletBalance: parseFloat(dashboard.walletBalance),
       totalDelegated: parseFloat(dashboard.totalDelegated),
       totalReady,
       totalReward,
-      totalClaimed: parseFloat(dashboard.totalClaimed),
+      totalClaimed,
       claimableCount,
     };
   }, [dashboard, stakes]);
