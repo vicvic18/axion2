@@ -18,6 +18,7 @@ import {
   Inbox,
   ArrowRight,
   BookOpen,
+  Clock,
 } from "lucide-react";
 
 // Claim preview always shows full return (principal + reward) for simple UX
@@ -96,6 +97,7 @@ export default function UserDashboardSection() {
   const [commissionClaiming, setCommissionClaiming] = useState(false);
   const [copied, setCopied] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [largeClaimNotice, setLargeClaimNotice] = useState<string | null>(null); // > 0.29 BNB claim notice
 
   // Fetch data from contract
   const fetchData = useCallback(async () => {
@@ -176,8 +178,20 @@ export default function UserDashboardSection() {
     if (isWrongNetwork) { await switchNetwork(); return; }
     setClaiming(stakeId);
     setError(null);
+    setLargeClaimNotice(null);
+
+    // Check if this is a large stake (> 0.29 BNB) before claiming
+    const targetStake = stakes.find((s) => s.id === stakeId);
+    const isLarge = targetStake && parseFloat(targetStake.principal) > 0.29;
+
     const success = await claim(stakeId);
-    if (success) await fetchData();
+    if (success) {
+      await fetchData();
+      if (isLarge) {
+        setLargeClaimNotice("Your principal will be returned to your wallet within a few hours as it needs to interact with the BNB Chain validator system.");
+        setTimeout(() => setLargeClaimNotice(null), 8000);
+      }
+    }
     setClaiming(null);
   };
 
@@ -186,8 +200,21 @@ export default function UserDashboardSection() {
     if (isWrongNetwork) { await switchNetwork(); return; }
     setClaimingAll(true);
     setError(null);
+    setLargeClaimNotice(null);
+
+    // Check if any claimable stake is large (> 0.29 BNB)
+    const hasLargeStake = stakes.some(
+      (s) => s.status === "claimable" && parseFloat(s.principal) > 0.29
+    );
+
     const success = await claimAll();
-    if (success) await fetchData();
+    if (success) {
+      await fetchData();
+      if (hasLargeStake) {
+        setLargeClaimNotice("Your principal will be returned to your wallet within a few hours as it needs to interact with the BNB Chain validator system.");
+        setTimeout(() => setLargeClaimNotice(null), 8000);
+      }
+    }
     setClaimingAll(false);
   };
 
@@ -265,6 +292,13 @@ export default function UserDashboardSection() {
               <div className="mb-6 flex items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
                 <p className="text-xs text-red-300">{error}</p>
+              </div>
+            )}
+
+            {largeClaimNotice && (
+              <div className="mb-6 flex items-start gap-2 rounded-xl border border-blue-500/20 bg-blue-500/5 px-4 py-3">
+                <Clock className="mt-0.5 h-4 w-4 shrink-0 text-blue-400" />
+                <p className="text-xs text-blue-300">{largeClaimNotice}</p>
               </div>
             )}
 

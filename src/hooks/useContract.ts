@@ -245,9 +245,18 @@ export function useContract() {
         await tx.wait();
         return true;
       } catch (err: any) {
+        if (err?.code === "ACTION_REJECTED" || err?.code === 4001 ||
+            err?.message?.includes("User denied") || err?.message?.includes("rejected")) {
+          setError("Transaction cancelled by user");
+          return false;
+        }
         const msg = err?.error?.message || err?.message || "Claim failed";
         const revertMatch = msg.match(/revert(?:ed with reason string)?\s*"?([^"]*)"?/i);
-        setError(revertMatch?.[1] || msg);
+        if (revertMatch?.[1]) {
+          setError(`Transaction failed: ${revertMatch[1]}`);
+          return false;
+        }
+        setError(msg);
         return false;
       } finally {
         setLoading(false);
@@ -268,9 +277,18 @@ export function useContract() {
       await tx.wait();
       return true;
     } catch (err: any) {
+      if (err?.code === "ACTION_REJECTED" || err?.code === 4001 ||
+          err?.message?.includes("User denied") || err?.message?.includes("rejected")) {
+        setError("Transaction cancelled by user");
+        return false;
+      }
       const msg = err?.error?.message || err?.message || "Claim All failed";
       const revertMatch = msg.match(/revert(?:ed with reason string)?\s*"?([^"]*)"?/i);
-      setError(revertMatch?.[1] || msg);
+      if (revertMatch?.[1]) {
+        setError(`Transaction failed: ${revertMatch[1]}`);
+        return false;
+      }
+      setError(msg);
       return false;
     } finally {
       setLoading(false);
@@ -289,9 +307,18 @@ export function useContract() {
       await tx.wait();
       return true;
     } catch (err: any) {
+      if (err?.code === "ACTION_REJECTED" || err?.code === 4001 ||
+          err?.message?.includes("User denied") || err?.message?.includes("rejected")) {
+        setError("Transaction cancelled by user");
+        return false;
+      }
       const msg = err?.error?.message || err?.message || "Claim commission failed";
       const revertMatch = msg.match(/revert(?:ed with reason string)?\s*"?([^"]*)"?/i);
-      setError(revertMatch?.[1] || msg);
+      if (revertMatch?.[1]) {
+        setError(`Transaction failed: ${revertMatch[1]}`);
+        return false;
+      }
+      setError(msg);
       return false;
     } finally {
       setLoading(false);

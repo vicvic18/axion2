@@ -149,7 +149,7 @@ export default function SubPageB() {
                 </div>
                 <div className="flex gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand/15 text-[10px] font-bold text-brand">4</span>
-                  <p><span className="font-medium text-white">Claim on maturity</span> — After the lock period ends, claim your principal + reward. </p>
+                  <p><span className="font-medium text-white">Claim on maturity</span> — After the lock period ends, claim your principal + reward. Small stakes (≤0.29 BNB) receive full return; large stakes receive reward only.</p>
                 </div>
               </div>
             </SectionCard>
