@@ -178,47 +178,40 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }));
   };
 
-  // ── WalletConnect with manual QR modal ──
+  // ── WalletConnect v2 ──
   const connectWalletConnect = async () => {
     const { EthereumProvider } = await import("@walletconnect/ethereum-provider");
-    const { WalletConnectModal } = await import("@walletconnect/modal");
 
     const provider = await EthereumProvider.init({
       projectId: PROJECT_ID,
-      chains: [BSC_CHAIN_ID],
-      showQrModal: false,
-      methods: ["eth_sendTransaction", "personal_sign", "eth_accounts", "eth_chainId"],
-      events: ["chainChanged", "accountsChanged"],
-      rpcMap: { [BSC_CHAIN_ID]: BSC_RPC },
+      chains: [BSC_CHAIN_ID],           // required chain
+      optionalChains: [56, 97, 1, 137], // BSC mainnet, testnet, ETH, Polygon
+      showQrModal: true,                 // let WalletConnect handle the modal
+      methods: ["eth_sendTransaction", "personal_sign", "eth_accounts", "eth_chainId", "wallet_switchEthereumChain"],
+      events: ["chainChanged", "accountsChanged", "connect", "disconnect"],
+      rpcMap: {
+        56: "https://bsc-dataseed.binance.org/",
+        97: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+      },
       metadata: {
         name: "Axion Stake",
         description: "Stake BNB with Axion validator",
-        url: typeof window !== "undefined" ? window.location.origin : "",
-        icons: [typeof window !== "undefined" ? `${window.location.origin}/logo.png` : ""],
+        url: typeof window !== "undefined" ? window.location.origin : "https://axionstake.com",
+        icons: [typeof window !== "undefined" ? `${window.location.origin}/logo.png` : "https://axionstake.com/logo.png"],
       },
     });
 
-    const modal = new WalletConnectModal({
-      projectId: PROJECT_ID,
-      themeMode: "dark",
-    } as any);
-
-    provider.on("display_uri", (displayUri: string) => {
-      modal.openModal({ uri: displayUri });
-    });
-
     try {
-      await provider.enable();
+      // Use connect() instead of enable() for WC v2
+      await provider.connect({
+        chains: [BSC_CHAIN_ID],
+        optionalChains: [56, 97],
+      });
     } catch (err: any) {
-      modal.closeModal();
       if (err?.message?.includes("rejected") || err?.code === 5000) {
         throw new Error("Connection rejected");
       }
       throw err;
-    } finally {
-      setTimeout(() => {
-        try { modal.closeModal(); } catch { /* ok */ }
-      }, 3000);
     }
 
     const accounts = provider.accounts;
@@ -242,7 +235,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       }
     });
     provider.on("chainChanged", (newChainId: string) => {
-      setState(prev => ({ ...prev, chainId: parseInt(newChainId) }));
+      const cid = parseInt(newChainId);
+      setState(prev => ({ ...prev, chainId: isNaN(cid) ? null : cid }));
+    });
+    provider.on("disconnect", () => {
+      setState({ address: null, isConnected: false, isConnecting: false, error: null, chainId: null, walletName: null, balance: "0" });
     });
   };
 

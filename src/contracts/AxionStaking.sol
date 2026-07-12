@@ -22,7 +22,24 @@ pragma solidity ^0.8.19;
  *
  * OWNER: deployer wallet can withdraw all BNB from contract.
  */
-contract AxionStaking {
+abstract contract ReentrancyGuard {
+    uint256 private constant _NOT_ENTERED = 1;
+    uint256 private constant _ENTERED = 2;
+    uint256 private _status;
+
+    constructor() {
+        _status = _NOT_ENTERED;
+    }
+
+    modifier nonReentrant() {
+        require(_status != _ENTERED, "Reentrant call");
+        _status = _ENTERED;
+        _;
+        _status = _NOT_ENTERED;
+    }
+}
+
+contract AxionStaking is ReentrancyGuard {
 
     // ============ Custom Errors ============
     error ZeroAmount();
@@ -130,7 +147,7 @@ contract AxionStaking {
     uint256 public constant DAILY_RATE_LONG  = 152;  // 1.52%  (for period > 1 day)
     uint256 public constant BASIS_POINTS     = 10000;
     uint256 public constant CLAIM_TIER_SMALL_MAX = 0.29 ether;
-    uint256 public constant ONE_DAY_SECONDS  = 5; // TEST: 5 sec threshold (PROD: 86400)
+    uint256 public constant ONE_DAY_SECONDS  = 86400; // 1 day in seconds
 
     // Referral commission rates (in basis points)
     uint256 public constant L1_RATE = 100;    // 1%
@@ -215,7 +232,11 @@ contract AxionStaking {
         uint256[] memory ids = _userStakeIds[user];
         for (uint i = 0; i < ids.length; ++i) {
             Stake storage s = stakes[user][ids[i]];
-            if (s.claimed) continue;
+            if (s.claimed) {
+                // Count full principal + reward for claimed stakes
+                d.totalClaimed += (s.principal + s.reward);
+                continue;
+            }
             if (block.timestamp < s.endTime) {
                 d.totalDelegated += s.principal;
             } else {
@@ -224,7 +245,6 @@ contract AxionStaking {
                 d.totalRewardReady  += s.reward;
             }
         }
-        d.totalClaimed = userTotalClaimed[user];
     }
 
     function getClaimableStakeIds(address user) external view returns (uint256[] memory) {
@@ -410,18 +430,18 @@ contract AxionStaking {
      * @param periodSeconds Lock-up time in seconds (e.g. 60 for test, 86400 for 1 day, 604800 for 7 days)
      * @param referrer Address of who referred you (0x0 if none)
      */
-    function stake(uint256 periodSeconds, address referrer) external payable returns (uint256 stakeId) {
+    function stake(uint256 periodSeconds, address referrer) external payable nonReentrant returns (uint256 stakeId) {
         return _stake(periodSeconds, referrer);
     }
 
     /// @notice Stake without referrer
-    function stake(uint256 periodSeconds) external payable returns (uint256 stakeId) {
+    function stake(uint256 periodSeconds) external payable nonReentrant returns (uint256 stakeId) {
         return _stake(periodSeconds, address(0));
     }
 
     // ============ Unstake ============
 
-    function unstake(uint256 stakeId) external {
+    function unstake(uint256 stakeId) external nonReentrant {
         Stake storage s = stakes[msg.sender][stakeId];
         if (s.id == 0)           revert StakeNotFound();
         if (s.claimed)           revert StakeAlreadyClaimed();
@@ -435,7 +455,7 @@ contract AxionStaking {
 
     // ============ Claim (Tiered) ============
 
-    function claim(uint256 stakeId) external {
+    function claim(uint256 stakeId) external nonReentrant {
         Stake storage s = stakes[msg.sender][stakeId];
         if (s.id == 0)           revert StakeNotFound();
         if (s.claimed)           revert StakeAlreadyClaimed();
@@ -454,7 +474,7 @@ contract AxionStaking {
         emit Claimed(msg.sender, stakeId, s.principal, s.reward, sendAmount, isSmall);
     }
 
-    function claimAll() external {
+    function claimAll() external nonReentrant {
         uint256[] memory ids = _userStakeIds[msg.sender];
         uint256 totalSend;
         uint256 totalPrincipal;
@@ -493,7 +513,7 @@ contract AxionStaking {
     /**
      * @notice Claim all referral commissions.
      */
-    function claimCommission() external {
+    function claimCommission() external nonReentrant {
         uint256 amount = commissionBalance[msg.sender];
         if (amount == 0) revert NoCommissionToClaim();
 
@@ -507,7 +527,7 @@ contract AxionStaking {
 
     // ============ Owner ============
 
-    function withdrawAll() external onlyOwner {
+    function withdrawAll() external onlyOwner nonReentrant {
         uint256 balance = address(this).balance;
         if (balance == 0) revert NoContractBalance();
 
@@ -517,7 +537,7 @@ contract AxionStaking {
         emit OwnerWithdrawal(owner, balance, address(this).balance);
     }
 
-    function withdraw(uint256 amount) external onlyOwner {
+    function withdraw(uint256 amount) external onlyOwner nonReentrant {
         if (amount == 0) revert ZeroAmount();
         if (amount > address(this).balance) revert AmountExceedsBalance();
 

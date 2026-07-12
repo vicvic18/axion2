@@ -4,7 +4,7 @@
 
 export const CONTRACT_ADDRESS =
   (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_CONTRACT_ADDRESS) ||
-  "0xAfc5219AdDDEeF95d96AE9d6973ca331A3027760"; // <-- 把你的合约地址填在这里
+  "0x3c84624a033eFC592D6443CC77F1830e9D22542d"; // <-- 把你的合约地址填在这里
 
 // BSC Network Config
 export const BSC_MAINNET = {
@@ -21,7 +21,7 @@ export const BSC_TESTNET = {
   explorer: "https://testnet.bscscan.com",
 };
 
-// Active network (change to BSC_MAINNET for production)
+// Active network: MAINNET for production
 export const ACTIVE_NETWORK = BSC_MAINNET;
 
 // ABI (Application Binary Interface) - auto-generated from Solidity source
