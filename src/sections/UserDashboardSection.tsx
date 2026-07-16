@@ -251,14 +251,14 @@ export default function UserDashboardSection() {
   const hasReferralActivity = referral.l1Count > 0 || referral.l2Count > 0 || parseFloat(referral.totalCommissionEarned) > 0;
 
   return (
-    <section id="dashboard" className="bg-axion-bg-secondary py-16 md:py-20">
-      <div className="mx-auto max-w-[1200px] px-6">
+    <section id="dashboard" className="bg-axion-bg-secondary py-10 md:py-16 lg:py-20">
+      <div className="mx-auto max-w-[1200px] px-4 md:px-6">
         {/* Header */}
-        <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <div className="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center md:mb-8 md:gap-4">
           <div>
-            <h2 className="text-2xl font-semibold text-white md:text-3xl">My Dashboard</h2>
+            <h2 className="text-xl font-semibold text-white md:text-2xl lg:text-3xl">My Dashboard</h2>
             {isConnected && address && (
-              <p className="mt-1 font-mono text-xs text-axion-text-tertiary">{address}</p>
+              <p className="mt-0.5 font-mono text-[10px] text-axion-text-tertiary md:mt-1 md:text-xs">{address}</p>
             )}
           </div>
           <div className="flex items-center gap-3">
@@ -317,50 +317,50 @@ export default function UserDashboardSection() {
             )}
 
             {/* Summary Cards */}
-            <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4">
-              <div className="rounded-2xl border border-axion-border bg-axion-bg-tertiary p-4">
-                <div className="mb-2 flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand/10"><Wallet className="h-4 w-4 text-brand" /></div>
-                  <span className="text-xs text-axion-text-tertiary">Wallet</span>
+            <div className="mb-6 grid grid-cols-2 gap-2 md:mb-8 md:grid-cols-4 md:gap-3">
+              <div className="rounded-xl border border-axion-border bg-axion-bg-tertiary p-3 md:rounded-2xl md:p-4">
+                <div className="mb-1.5 flex items-center gap-1.5 md:mb-2 md:gap-2">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-md bg-brand/10 md:h-8 md:w-8 md:rounded-lg"><Wallet className="h-3.5 w-3.5 text-brand md:h-4 md:w-4" /></div>
+                  <span className="text-[11px] text-axion-text-tertiary md:text-xs">Wallet</span>
                 </div>
-                <p className="font-tabular text-xl font-bold text-white">{summary.walletBalance.toFixed(4)}</p>
-                <p className="text-xs text-axion-text-muted">BNB Available</p>
+                <p className="font-tabular text-lg font-bold text-white md:text-xl">{summary.walletBalance.toFixed(4)}</p>
+                <p className="text-[11px] text-axion-text-muted md:text-xs">BNB Available</p>
               </div>
-              <div className="rounded-2xl border border-axion-border bg-axion-bg-tertiary p-4">
-                <div className="mb-2 flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10"><Lock className="h-4 w-4 text-blue-400" /></div>
-                  <span className="text-xs text-axion-text-tertiary">Delegated</span>
+              <div className="rounded-xl border border-axion-border bg-axion-bg-tertiary p-3 md:rounded-2xl md:p-4">
+                <div className="mb-1.5 flex items-center gap-1.5 md:mb-2 md:gap-2">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-500/10 md:h-8 md:w-8 md:rounded-lg"><Lock className="h-3.5 w-3.5 text-blue-400 md:h-4 md:w-4" /></div>
+                  <span className="text-[11px] text-axion-text-tertiary md:text-xs">Delegated</span>
                 </div>
-                <p className="font-tabular text-xl font-bold text-white">{summary.totalDelegated.toFixed(4)}</p>
-                <p className="text-xs text-axion-text-muted">BNB Locked</p>
+                <p className="font-tabular text-lg font-bold text-white md:text-xl">{summary.totalDelegated.toFixed(4)}</p>
+                <p className="text-[11px] text-axion-text-muted md:text-xs">BNB Locked</p>
               </div>
-              <div className="rounded-2xl border border-axion-border bg-axion-bg-tertiary p-4">
-                <div className="mb-2 flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-axion-success-glow"><Gift className="h-4 w-4 text-axion-success" /></div>
-                  <span className="text-xs text-axion-text-tertiary">Ready to Claim</span>
+              <div className="rounded-xl border border-axion-border bg-axion-bg-tertiary p-3 md:rounded-2xl md:p-4">
+                <div className="mb-1.5 flex items-center gap-1.5 md:mb-2 md:gap-2">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-md bg-axion-success-glow md:h-8 md:w-8 md:rounded-lg"><Gift className="h-3.5 w-3.5 text-axion-success md:h-4 md:w-4" /></div>
+                  <span className="text-[11px] text-axion-text-tertiary md:text-xs">Ready to Claim</span>
                 </div>
-                <p className="font-tabular text-xl font-bold text-axion-success">{summary.totalReady.toFixed(4)}</p>
-                <p className="text-xs text-axion-text-muted">{summary.claimableCount} stake{summary.claimableCount !== 1 ? "s" : ""}</p>
+                <p className="font-tabular text-lg font-bold text-axion-success md:text-xl">{summary.totalReady.toFixed(4)}</p>
+                <p className="text-[11px] text-axion-text-muted md:text-xs">{summary.claimableCount} stake{summary.claimableCount !== 1 ? "s" : ""}</p>
               </div>
-              <div className="rounded-2xl border border-axion-border bg-axion-bg-tertiary p-4">
-                <div className="mb-2 flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10"><CheckCircle2 className="h-4 w-4 text-purple-400" /></div>
-                  <span className="text-xs text-axion-text-tertiary">Claimed</span>
+              <div className="rounded-xl border border-axion-border bg-axion-bg-tertiary p-3 md:rounded-2xl md:p-4">
+                <div className="mb-1.5 flex items-center gap-1.5 md:mb-2 md:gap-2">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-md bg-purple-500/10 md:h-8 md:w-8 md:rounded-lg"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 md:h-4 md:w-4" /></div>
+                  <span className="text-[11px] text-axion-text-tertiary md:text-xs">Claimed</span>
                 </div>
-                <p className="font-tabular text-xl font-bold text-white">{summary.totalClaimed.toFixed(4)}</p>
-                <p className="text-xs text-axion-text-muted">BNB Total</p>
+                <p className="font-tabular text-lg font-bold text-white md:text-xl">{summary.totalClaimed.toFixed(4)}</p>
+                <p className="text-[11px] text-axion-text-muted md:text-xs">BNB Total</p>
               </div>
             </div>
 
             {/* Stakes Table */}
-            <div className="mb-8 rounded-2xl border border-axion-border bg-axion-bg-tertiary">
-              <div className="flex items-center justify-between border-b border-axion-border px-5 py-4">
-                <h3 className="text-sm font-semibold text-white">My Stakes</h3>
+            <div className="mb-6 rounded-xl border border-axion-border bg-axion-bg-tertiary md:mb-8 md:rounded-2xl">
+              <div className="flex items-center justify-between border-b border-axion-border px-4 py-3 md:px-5 md:py-4">
+                <h3 className="text-xs font-semibold text-white md:text-sm">My Stakes</h3>
                 {summary.claimableCount > 0 && isReady && (
                   <button onClick={handleClaimAll} disabled={claimingAll}
-                    className="flex items-center gap-2 rounded-xl bg-axion-success px-5 py-3 text-sm font-semibold text-white transition-all hover:bg-axion-success/90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50">
-                    <Gift className="h-3.5 w-3.5" />
-                    {claimingAll ? "Claiming All..." : `Claim All (${summary.totalReady.toFixed(4)} BNB)`}
+                    className="flex items-center gap-1.5 rounded-lg bg-axion-success px-3 py-2 text-xs font-semibold text-white transition-all hover:bg-axion-success/90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 md:gap-2 md:rounded-xl md:px-5 md:py-3 md:text-sm">
+                    <Gift className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                    {claimingAll ? "Claiming..." : `Claim All (${summary.totalReady.toFixed(4)} BNB)`}
                   </button>
                 )}
               </div>
@@ -397,28 +397,28 @@ export default function UserDashboardSection() {
                         const ratePct = (stake.dailyRate / 100).toFixed(2);
                         return (
                           <tr key={stake.id} className="border-b border-axion-border/50 transition-colors hover:bg-axion-bg-secondary">
-                            <td className="px-5 py-4"><span className="font-tabular text-sm font-medium text-white">{parseFloat(stake.principal).toFixed(4)} BNB</span></td>
-                            <td className="px-5 py-4"><span className="rounded-full bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand">{days}D @ {ratePct}%/day</span></td>
-                            <td className="px-5 py-4"><div className="text-xs text-axion-text-secondary"><div>{formatDate(stake.startTime)}</div><div className="text-axion-text-muted">→ {formatDate(stake.endTime)}</div></div></td>
-                            <td className="px-5 py-4">
-                              <div className="w-full max-w-[100px]">
-                                <div className="mb-1 text-[10px] text-axion-text-muted">{stake.progress}%</div>
+                            <td className="px-3 py-3 md:px-5 md:py-4"><span className="font-tabular text-xs font-medium text-white md:text-sm">{parseFloat(stake.principal).toFixed(4)} BNB</span></td>
+                            <td className="px-3 py-3 md:px-5 md:py-4"><span className="rounded-full bg-brand/10 px-1.5 py-0.5 text-[10px] font-medium text-brand md:px-2 md:text-xs">{days}D @ {ratePct}%/day</span></td>
+                            <td className="px-3 py-3 md:px-5 md:py-4"><div className="text-[10px] text-axion-text-secondary md:text-xs"><div>{formatDate(stake.startTime)}</div><div className="text-axion-text-muted">→ {formatDate(stake.endTime)}</div></div></td>
+                            <td className="px-3 py-3 md:px-5 md:py-4">
+                              <div className="w-full max-w-[80px] md:max-w-[100px]">
+                                <div className="mb-1 text-[9px] text-axion-text-muted md:text-[10px]">{stake.progress}%</div>
                                 <div className="h-1.5 w-full overflow-hidden rounded-full bg-axion-bg-secondary">
                                   <div className="h-full rounded-full transition-all" style={{ width: `${stake.progress}%`, backgroundColor: stake.status === "claimable" ? "#22C55E" : stake.status === "claimed" ? "#8B5CF6" : "#1199FF" }} />
                                 </div>
                               </div>
                             </td>
-                            <td className="px-5 py-4 text-right"><span className="font-tabular text-sm text-axion-success">+{parseFloat(stake.reward).toFixed(6)}</span></td>
-                            <td className="px-5 py-4 text-right"><span className={`font-tabular text-xs ${preview.color}`}>{preview.label}</span></td>
-                            <td className="px-5 py-4 text-right">
-                              {stake.status === "locked" && <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2.5 py-1 text-xs font-medium text-blue-400"><Lock className="h-3 w-3" />Locked</span>}
+                            <td className="px-3 py-3 text-right md:px-5 md:py-4"><span className="font-tabular text-xs text-axion-success md:text-sm">+{parseFloat(stake.reward).toFixed(6)}</span></td>
+                            <td className="px-3 py-3 text-right md:px-5 md:py-4"><span className={`font-tabular text-[10px] ${preview.color} md:text-xs`}>{preview.label}</span></td>
+                            <td className="px-3 py-3 text-right md:px-5 md:py-4">
+                              {stake.status === "locked" && <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2 py-0.5 text-[10px] font-medium text-blue-400 md:px-2.5 md:py-1 md:text-xs"><Lock className="h-2.5 w-2.5 md:h-3 md:w-3" />Locked</span>}
                               {stake.status === "claimable" && (
                                 <button onClick={() => handleClaim(stake.id)} disabled={claiming === stake.id || !isReady}
-                                  className="inline-flex items-center gap-1 rounded-full bg-axion-success/15 px-3 py-1.5 text-xs font-semibold text-axion-success transition-all hover:bg-axion-success hover:text-white disabled:cursor-not-allowed disabled:opacity-50">
-                                  <Gift className="h-3 w-3" />{claiming === stake.id ? "..." : "Claim"}
+                                  className="inline-flex items-center gap-1 rounded-full bg-axion-success/15 px-2 py-1 text-[10px] font-semibold text-axion-success transition-all hover:bg-axion-success hover:text-white disabled:cursor-not-allowed disabled:opacity-50 md:px-3 md:py-1.5 md:text-xs">
+                                  <Gift className="h-2.5 w-2.5 md:h-3 md:w-3" />{claiming === stake.id ? "..." : "Claim"}
                                 </button>
                               )}
-                              {stake.status === "claimed" && <span className="inline-flex items-center gap-1 rounded-full bg-purple-500/10 px-2.5 py-1 text-xs font-medium text-purple-400"><CheckCircle2 className="h-3 w-3" />Claimed</span>}
+                              {stake.status === "claimed" && <span className="inline-flex items-center gap-1 rounded-full bg-purple-500/10 px-2 py-0.5 text-[10px] font-medium text-purple-400 md:px-2.5 md:py-1 md:text-xs"><CheckCircle2 className="h-2.5 w-2.5 md:h-3 md:w-3" />Claimed</span>}
                             </td>
                           </tr>
                         );
@@ -430,17 +430,17 @@ export default function UserDashboardSection() {
             </div>
 
             {/* ====== REFERRAL ====== */}
-            <div className="rounded-2xl border border-axion-border bg-axion-bg-tertiary">
-              <div className="border-b border-axion-border px-5 py-4">
+            <div className="rounded-xl border border-axion-border bg-axion-bg-tertiary md:rounded-2xl">
+              <div className="border-b border-axion-border px-4 py-3 md:px-5 md:py-4">
                 <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-brand" />
-                  <h3 className="text-sm font-semibold text-white">Referral Program</h3>
-                  <span className="ml-2 rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-semibold text-brand">1% L1 / 0.25% L2</span>
+                  <Users className="h-3.5 w-3.5 text-brand md:h-4 md:w-4" />
+                  <h3 className="text-xs font-semibold text-white md:text-sm">Referral Program</h3>
+                  <span className="ml-2 rounded-full bg-brand/10 px-1.5 py-0.5 text-[9px] font-semibold text-brand md:px-2 md:text-[10px]">1% L1 / 0.25% L2</span>
                 </div>
               </div>
 
-              <div className="p-5">
-                <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+              <div className="p-4 md:p-5">
+                <div className="grid grid-cols-1 gap-4 md:gap-5 lg:grid-cols-3">
                   {/* Left: Referral Link + Stats */}
                   <div className="lg:col-span-2 space-y-5">
                     {/* Referral Link */}

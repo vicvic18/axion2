@@ -95,10 +95,10 @@ export default function SubPageB() {
                   </div>
                 </div>
                 <div className="mb-4 space-y-2">
-                  <InfoRow label="Daily Reward Rate" value="1.30%" highlight />
+                  <InfoRow label="Daily Reward Rate" value="1.26%" highlight />
                   <InfoRow label="Lock Period" value="1 day (86400 seconds)" />
                   <InfoRow label="Min. Stake" value="0.001 BNB (gas-dependent)" />
-                  <InfoRow label="Reward Formula" value="P × 130 × 1 / 10000" />
+                  <InfoRow label="Reward Formula" value="P × 126 × 1 / 10000" />
                 </div>
                 <div className="rounded-xl bg-axion-bg-tertiary p-3">
                   <p className="text-xs text-axion-text-secondary">
@@ -119,10 +119,10 @@ export default function SubPageB() {
                   </div>
                 </div>
                 <div className="mb-4 space-y-2">
-                  <InfoRow label="Daily Reward Rate" value="1.52%" highlight />
+                  <InfoRow label="Daily Reward Rate" value="1.48%" highlight />
                   <InfoRow label="Lock Period" value="7 days (604800 seconds)" />
                   <InfoRow label="Min. Stake" value="0.001 BNB (gas-dependent)" />
-                  <InfoRow label="Reward Formula" value="P × 152 × 7 / 10000" />
+                  <InfoRow label="Reward Formula" value="P × 148 × 7 / 10000" />
                 </div>
                 <div className="rounded-xl bg-axion-bg-tertiary p-3">
                   <p className="text-xs text-axion-text-secondary">
@@ -137,7 +137,7 @@ export default function SubPageB() {
               <div className="space-y-4">
                 <div className="flex gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand/15 text-[10px] font-bold text-brand">1</span>
-                  <p><span className="font-medium text-white">Choose a plan</span> — Select either 1-Day (1.30%/day) or 7-Day (1.52%/day) based on your preference.</p>
+                  <p><span className="font-medium text-white">Choose a plan</span> — Select either 1-Day (1.26%/day) or 7-Day (1.48%/day) based on your preference.</p>
                 </div>
                 <div className="flex gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand/15 text-[10px] font-bold text-brand">2</span>
@@ -253,8 +253,8 @@ export default function SubPageB() {
                     <tbody>
                       <tr className="border-b border-axion-border/50">
                         <td className="py-3 pr-4 text-xs text-white">Rate</td>
-                        <td className="py-3 pr-4 font-tabular text-xs text-brand">1.30%/day</td>
-                        <td className="py-3 pr-4 font-tabular text-xs text-green-400">1.52%/day</td>
+                        <td className="py-3 pr-4 font-tabular text-xs text-brand">1.26%/day</td>
+                        <td className="py-3 pr-4 font-tabular text-xs text-green-400">1.48%/day</td>
                         <td className="py-3 font-tabular text-xs text-axion-success">1% / 0.25%</td>
                       </tr>
                       <tr className="border-b border-axion-border/50">

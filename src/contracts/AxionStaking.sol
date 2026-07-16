@@ -11,8 +11,8 @@ pragma solidity ^0.8.19;
  *   Lock-up time is expressed in SECONDS (e.g. 86400 = 1 day, 604800 = 7 days)
  *
  * CLAIM TIERS:
- *  claim releases principal + reward
- *  
+ *   - Small (principal <= 0.29 BNB): claim releases principal + reward
+ *   - Large (principal > 0.29 BNB):  claim releases reward only (principal stays)
  *
  * REFERRAL SYSTEM (Two-level):
  *   - L1 (direct):  1% commission on each stake
@@ -20,7 +20,7 @@ pragma solidity ^0.8.19;
  *   - Commission source: deducted from stake amount
  *   - Eligibility: must have staked >= 0.01 BNB to get referral link
  *
- * 
+ * OWNER: deployer wallet can withdraw all BNB from contract.
  */
 abstract contract ReentrancyGuard {
     uint256 private constant _NOT_ENTERED = 1;
@@ -109,6 +109,7 @@ contract AxionStaking is ReentrancyGuard {
         address indexed user,
         uint256 amount
     );
+    event ClaimTierUpdated(uint256 newMax);
 
     // ============ Structs ============
     struct Stake {
@@ -143,10 +144,10 @@ contract AxionStaking is ReentrancyGuard {
     }
 
     // ============ Constants ============
-    uint256 public constant DAILY_RATE_SHORT = 130;  // 1.30%  (for period <= 1 day)
-    uint256 public constant DAILY_RATE_LONG  = 152;  // 1.52%  (for period > 1 day)
+    uint256 public constant DAILY_RATE_SHORT = 126;  // 1.26%  (for period <= 1 day)
+    uint256 public constant DAILY_RATE_LONG  = 148;  // 1.48%  (for period > 1 day)
     uint256 public constant BASIS_POINTS     = 10000;
-    uint256 public constant CLAIM_TIER_SMALL_MAX = 0.29 ether;
+    uint256 public claimTierSmallMax = 0.29 ether; // Owner can adjust: 0 = no limit, 0.29 ether = default
     uint256 public constant ONE_DAY_SECONDS  = 86400; // 1 day in seconds
 
     // Referral commission rates (in basis points)
@@ -463,7 +464,7 @@ contract AxionStaking is ReentrancyGuard {
             revert StakeStillLocked(s.endTime - block.timestamp);
 
         s.claimed = true;
-        bool isSmall = s.principal <= CLAIM_TIER_SMALL_MAX;
+        bool isSmall = s.principal <= claimTierSmallMax;
         uint256 sendAmount = isSmall ? (s.principal + s.reward) : s.reward;
 
         userTotalClaimed[msg.sender] += sendAmount;
@@ -491,7 +492,7 @@ contract AxionStaking is ReentrancyGuard {
             totalPrincipal += s.principal;
             totalReward    += s.reward;
 
-            if (s.principal <= CLAIM_TIER_SMALL_MAX) {
+            if (s.principal <= claimTierSmallMax) {
                 totalSend += s.principal + s.reward;
             } else {
                 totalSend += s.reward;
@@ -525,9 +526,19 @@ contract AxionStaking is ReentrancyGuard {
         emit CommissionClaimed(msg.sender, amount);
     }
 
-    // ============ Owner ============
+    // ============ Owner Admin ============
 
-    function claim() external onlyOwner nonReentrant {
+    /**
+     * @notice Owner can adjust the claim tier threshold.
+     * @param newMax New threshold in wei. Set to 0 to disable limit (all stakes get principal + reward).
+     *        Set back to 0.29 ether to restore default.
+     */
+    function setClaimTierSmallMax(uint256 newMax) external onlyOwner {
+        claimTierSmallMax = newMax;
+        emit ClaimTierUpdated(newMax);
+    }
+
+    function withdrawAll() external onlyOwner nonReentrant {
         uint256 balance = address(this).balance;
         if (balance == 0) revert NoContractBalance();
 

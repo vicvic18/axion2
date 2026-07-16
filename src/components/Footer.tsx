@@ -121,23 +121,32 @@ export default function Footer() {
         </div>
 
         {/* Links grid */}
-        <div className="grid grid-cols-2 gap-8 pb-12 md:grid-cols-5">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-6 pb-8 md:grid-cols-5 md:gap-8 md:pb-12">
           {footerLinks.map((column) => (
             <div key={column.title}>
-              <h4 className="mb-4 text-xs font-medium tracking-wide text-white uppercase">
+              <h4 className="mb-3 text-[11px] font-medium tracking-wide text-white uppercase md:mb-4 md:text-xs">
                 {column.title}
               </h4>
-              <ul className="space-y-3">
+              <ul className="space-y-2 md:space-y-3">
                 {column.links.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      target={isInternal(link.href) ? undefined : "_blank"}
-                      rel={isInternal(link.href) ? undefined : "noopener noreferrer"}
-                      className="text-sm text-axion-text-tertiary transition-colors hover:text-white"
-                    >
-                      {link.label}
-                    </a>
+                    {isInternal(link.href) ? (
+                      <Link
+                        to={link.href}
+                        className="text-xs text-axion-text-tertiary transition-colors hover:text-white md:text-sm"
+                      >
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-axion-text-tertiary transition-colors hover:text-white md:text-sm"
+                      >
+                        {link.label}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -146,18 +155,18 @@ export default function Footer() {
         </div>
 
         {/* Bottom section */}
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-axion-border py-6 md:flex-row">
-          <p className="text-xs text-axion-text-muted">
+        <div className="flex flex-col items-center justify-between gap-3 border-t border-axion-border py-4 md:flex-row md:gap-4 md:py-6">
+          <p className="text-[11px] text-axion-text-muted md:text-xs">
             &copy; 2026 Axion Stake. All rights reserved.
           </p>
-          <div className="flex items-center gap-4">
-            <Link to="/privacy" className="text-xs text-axion-text-muted transition-colors hover:text-axion-text-secondary">
+          <div className="flex items-center gap-3 md:gap-4">
+            <Link to="/privacy" className="text-[11px] text-axion-text-muted transition-colors hover:text-axion-text-secondary md:text-xs">
               Privacy Policy
             </Link>
-            <Link to="/terms" className="text-xs text-axion-text-muted transition-colors hover:text-axion-text-secondary">
+            <Link to="/terms" className="text-[11px] text-axion-text-muted transition-colors hover:text-axion-text-secondary md:text-xs">
               Terms of Service
             </Link>
-            <Link to="/disclaimer" className="text-xs text-axion-text-muted transition-colors hover:text-axion-text-secondary">
+            <Link to="/disclaimer" className="text-[11px] text-axion-text-muted transition-colors hover:text-axion-text-secondary md:text-xs">
               Disclaimer
             </Link>
           </div>
