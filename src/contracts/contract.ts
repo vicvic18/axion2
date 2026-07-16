@@ -4,7 +4,7 @@
 
 export const CONTRACT_ADDRESS =
   (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_CONTRACT_ADDRESS) ||
-  "0x8bDDE3f2FB75CF7f520aeFF538c25d60f88257B4"; // <-- 把你的合约地址填在这里
+  "0xB52D5055dcc5daEfcC844BBEB5d44D02248E1Bf6"; // <-- 把你的合约地址填在这里
 
 // BSC Network Config
 export const BSC_MAINNET = {
