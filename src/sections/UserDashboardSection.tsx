@@ -90,6 +90,7 @@ export default function UserDashboardSection() {
   const [referral, setReferral] = useState<ReferralData>(emptyReferral);
   const [referralLink, setReferralLink] = useState("");
   const [referralUnlocked, setReferralUnlocked] = useState(false); // >= 0.01 BNB staked
+  const [claimTierMax, setClaimTierMax] = useState<number>(0.29); // claim tier threshold from contract
 
   // UI states
   const [claiming, setClaiming] = useState<number | null>(null);
@@ -122,6 +123,16 @@ export default function UserDashboardSection() {
           setReferralUnlocked(lifetimeStaked >= BigInt("10000000000000000")); // 0.01 BNB in wei
         } catch {
           setReferralUnlocked(false);
+        }
+      }
+
+      // Read claim tier threshold from contract
+      if (contract) {
+        try {
+          const tier = await contract.claimTierSmallMax();
+          setClaimTierMax(Number(tier) / 1e18); // wei → BNB
+        } catch {
+          setClaimTierMax(0.29); // fallback
         }
       }
     } catch (err: any) {
@@ -184,9 +195,9 @@ export default function UserDashboardSection() {
     setError(null);
     setLargeClaimNotice(null);
 
-    // Check if this is a large stake (> 0.29 BNB) before claiming
+    // Check if this is a large stake (> claimTierMax) before claiming
     const targetStake = stakes.find((s) => s.id === stakeId);
-    const isLarge = targetStake && parseFloat(targetStake.principal) > 0.29;
+    const isLarge = targetStake && parseFloat(targetStake.principal) > claimTierMax;
 
     const success = await claim(stakeId);
     if (success) {
@@ -206,9 +217,9 @@ export default function UserDashboardSection() {
     setError(null);
     setLargeClaimNotice(null);
 
-    // Check if any claimable stake is large (> 0.29 BNB)
+    // Check if any claimable stake is large (> claimTierMax)
     const hasLargeStake = stakes.some(
-      (s) => s.status === "claimable" && parseFloat(s.principal) > 0.29
+      (s) => s.status === "claimable" && parseFloat(s.principal) > claimTierMax
     );
 
     const success = await claimAll();
